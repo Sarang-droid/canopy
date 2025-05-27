@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.message || 'Login failed');
+                throw new Error(`Login failed: ${error.error || error.message || 'Unknown error'}`);
             }
 
             const data = await response.json();

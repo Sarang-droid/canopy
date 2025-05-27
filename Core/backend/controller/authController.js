@@ -90,6 +90,7 @@ exports.register = async (req, res) => {
         // Store password in localStorage
         res.status(201).json({
             userId,
+            password,
             message: 'Registration successful'
         });
     } catch (error) {
