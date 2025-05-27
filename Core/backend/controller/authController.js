@@ -2,6 +2,15 @@ const User = require('../models/Users');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const { validationResult } = require('express-validator');
+
+// Load environment variables
+require('dotenv').config();
+
+// Ensure JWT_SECRET is set
+if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET must be set in environment variables');
+}
 
 // Helper function to generate user ID
 const generateUserId = async (department) => {
@@ -43,8 +52,24 @@ const generatePassword = () => {
 // Registration
 exports.register = async (req, res) => {
     try {
+        // Validate input
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                errors: errors.array()
+            });
+        }
+
         const { name, email, department, role } = req.body;
         
+        // Check if email already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                error: 'Email already registered'
+            });
+        }
+
         // Generate user ID and password
         const userId = await generateUserId(department);
         const password = generatePassword();
@@ -62,10 +87,9 @@ exports.register = async (req, res) => {
         // Save user to database
         await user.save();
         
-        // Return user ID and password to frontend
+        // Store password in localStorage
         res.status(201).json({
             userId,
-            password,
             message: 'Registration successful'
         });
     } catch (error) {
@@ -104,7 +128,7 @@ exports.login = async (req, res) => {
                 department: user.department,
                 role: user.role
             },
-            process.env.JWT_SECRET || 'your-secret-key',
+            process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
         
