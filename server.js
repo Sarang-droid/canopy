@@ -21,17 +21,51 @@ app.use(requestLogger);
 // Database connection
 connectCanopyDB().catch(console.error);
 
-// API routes
-app.use('/api/core/auth', authRoutes);
-app.use('/api/core', coreRoutes);
+// Authentication middleware
+const authMiddleware = (req, res, next) => {
+    const token = req.cookies.authToken;
+    if (!token) {
+        // If no token, redirect to register.html
+        res.redirect('/register.html');
+        return;
+    }
+    next();
+};
 
 // Static files and frontend
 app.use(express.static(path.join(__dirname, 'Core/frontend')));
 
-// Fallback route for frontend pages
-app.get('*', (req, res) => {
+// Routes for static files
+app.get('/register.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Core/frontend', 'register.html'));
+});
+
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Core/frontend', 'login.html'));
+});
+
+// Protected route for index.html
+app.get('/index.html', authMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'Core/frontend', 'index.html'));
 });
+
+// Default route - redirect to register.html
+app.get('/', (req, res) => {
+    res.redirect('/register.html');
+});
+
+// Catch-all route for any other requests
+app.get('*', (req, res) => {
+    res.redirect('/register.html');
+});
+
+// API routes
+app.use('/api/core/auth', authRoutes);
+app.use('/api/core', coreRoutes);
+
+// API routes
+app.use('/api/core/auth', authRoutes);
+app.use('/api/core', coreRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
