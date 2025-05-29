@@ -49,6 +49,11 @@ app.get('/index.html', authMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'Core/frontend', 'index.html'));
 });
 
+// Public route for Canopy branch
+app.get('/branches/canopy/frontend/Canopy.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'branches/canopy/frontend', 'Canopy.html'));
+});
+
 // Default route - redirect to register.html
 app.get('/', (req, res) => {
     res.redirect('/register.html');

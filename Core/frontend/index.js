@@ -2,6 +2,8 @@ let tree;
 let branchData;
 let barkTexture;
 let leafImages = [];
+let skyBuffer;
+let groundBuffer;
 
 function preload() {
   barkTexture = createGraphics(100, 100);
@@ -71,10 +73,16 @@ function drawLeafShape(g, type) {
 }
 
 function setup() {
-  let canvas = createCanvas(800, 600);
+  let canvas = createCanvas(800, 600, { willReadFrequently: true });
   canvas.parent('canvas-container');
   frameRate(30);
   textFont('Arial');
+  
+  // Create buffers for static sky and ground
+  skyBuffer = createGraphics(width, height);
+  groundBuffer = createGraphics(width, height);
+  drawSkyBuffer();
+  drawGroundBuffer();
   
   branchData = [
     { label: "Technical", angle: -PI/1.8, description: "Technical infrastructure and development capabilities" },
@@ -125,53 +133,53 @@ function setup() {
   tree.state.tooltip.hide();
 }
 
-function draw() {
-  drawSky();
-  drawGround();
-  drawTree();
-  updateInfoPanel();
-}
-
-function drawSky() {
+function drawSkyBuffer() {
   for (let y = 0; y < height; y++) {
     let inter = map(y, 0, height, 0, 1);
     let c = lerpColor(color(135, 206, 250), color(240, 248, 255), inter);
-    stroke(c);
-    line(0, y, width, y);
+    skyBuffer.stroke(c);
+    skyBuffer.line(0, y, width, y);
   }
   
-  noStroke();
-  fill(255, 255, 255, 100);
+  skyBuffer.noStroke();
+  skyBuffer.fill(255, 255, 255, 100);
   for (let i = 0; i < 5; i++) {
-    let x = (frameCount * 0.5 + i * 200) % (width + 200) - 100;
+    let x = i * 200 % (width + 200) - 100;
     let y = 50 + noise(i * 10) * 50;
-    ellipse(x, y, 100, 40);
-    ellipse(x + 30, y - 10, 80, 40);
-    ellipse(x - 20, y + 10, 60, 30);
+    skyBuffer.ellipse(x, y, 100, 40);
+    skyBuffer.ellipse(x + 30, y - 10, 80, 40);
+    skyBuffer.ellipse(x - 20, y + 10, 60, 30);
   }
 }
 
-function drawGround() {
-  noStroke();
-  fill(34, 139, 34);
-  rect(0, height - 50, width, 50);
+function drawGroundBuffer() {
+  groundBuffer.noStroke();
+  groundBuffer.fill(34, 139, 34);
+  groundBuffer.rect(0, height - 50, width, 50);
   
-  fill(139, 69, 19);
+  groundBuffer.fill(139, 69, 19);
   for (let x = 0; x < width; x += 20) {
-    beginShape();
-    vertex(x, height - 50);
-    vertex(x + 20, height - 50);
-    vertex(x + 20, height - 40 + noise(x * 0.1) * 10);
-    vertex(x, height - 40 + noise(x * 0.1 + 10) * 10);
-    endShape(CLOSE);
+    groundBuffer.beginShape();
+    groundBuffer.vertex(x, height - 50);
+    groundBuffer.vertex(x + 20, height - 50);
+    groundBuffer.vertex(x + 20, height - 40 + noise(x * 0.1) * 10);
+    groundBuffer.vertex(x, height - 40 + noise(x * 0.1 + 10) * 10);
+    groundBuffer.endShape(CLOSE);
   }
   
-  stroke(50, 120, 50);
-  strokeWeight(1);
+  groundBuffer.stroke(50, 120, 50);
+  groundBuffer.strokeWeight(1);
   for (let x = 0; x < width; x += 5) {
     let h = noise(x * 0.1) * 15;
-    line(x, height - 50, x + random(-3, 3), height - 50 - h);
+    groundBuffer.line(x, height - 50, x + random(-3, 3), height - 50 - h);
   }
+}
+
+function draw() {
+  image(skyBuffer, 0, 0);
+  image(groundBuffer, 0, 0);
+  drawTree();
+  updateInfoPanel();
 }
 
 function drawTree() {
@@ -211,7 +219,6 @@ function drawTrunk() {
     let xOffset1 = sin(y1 * 0.05 + frameCount * 0.02) * 5;
     let xOffset2 = sin(y2 * 0.05 + frameCount * 0.02) * 5;
     
-    // Draw trunk segment with procedural bark effect
     noStroke();
     fill(80, 50, 20);
     beginShape();
@@ -221,7 +228,6 @@ function drawTrunk() {
     vertex(-w2/2 + xOffset2, y2);
     endShape(CLOSE);
     
-    // Apply bark texture effect using noise
     for (let x = -w1/2 + xOffset1; x < w1/2 + xOffset1; x += 2) {
       for (let y = y1; y < y2; y += 2) {
         let n = noise(x * 0.1, y * 0.1);
@@ -231,7 +237,6 @@ function drawTrunk() {
       }
     }
     
-    // Draw bark details
     stroke(40, 25, 10);
     strokeWeight(1);
     if (i % 5 === 0) {
@@ -328,10 +333,10 @@ function updateBranches() {
       }
     }
 
-    let endX = width / 2 + sin(b.currentAngle) * b.currentLength * 0.9;
-    let endY = height - tree.trunk.height + cos(b.currentAngle) * b.currentLength * 0.9;
-    b.clickBox.x = endX - b.clickBox.w / 2;
-    b.clickBox.y = endY - b.clickBox.h / 2;
+    let endX = sin(b.currentAngle) * b.currentLength;
+    let endY = -tree.trunk.height + cos(b.currentAngle) * b.currentLength;
+    b.clickBox.x = width / 2 + endX - b.clickBox.w / 2;
+    b.clickBox.y = height + endY - b.clickBox.h / 2;
   }
 }
 
@@ -473,18 +478,26 @@ function mousePressed() {
   let clickedBranch = checkBranchClick(mouseX, mouseY);
   
   if (clickedBranch !== null) {
-    tree.state.selectedBranch = clickedBranch;
-    updateBranchInfo(clickedBranch);
-    
-    tree.branches[clickedBranch].targetAngle += random(-0.4, 0.4);
-    tree.branches[clickedBranch].targetLength *= random(0.85, 1.15);
-    
-    createLeaves(clickedBranch);
-    for (let i = 0; i < 5; i++) {
-      let leaf = random(tree.leaves.filter(l => l.branch === clickedBranch));
-      if (leaf && !leaf.falling) {
-        leaf.falling = true;
-        leaf.fallSpeed = random(1, 3);
+    if (branchData[clickedBranch].label === "Canopy") {
+      // Use an absolute path for redirection
+      const path = window.location.pathname;
+      const base = path.substring(0, path.lastIndexOf('/') + 1);
+      window.location.href = base + '../branches/canopy/frontend/Canopy.html';
+      return;
+    } else {
+      tree.state.selectedBranch = clickedBranch;
+      updateBranchInfo(clickedBranch);
+      
+      tree.branches[clickedBranch].targetAngle += random(-0.2, 0.2);
+      tree.branches[clickedBranch].targetLength *= random(0.9, 1.1);
+      
+      createLeaves(clickedBranch);
+      for (let i = 0; i < 3; i++) {
+        let leaf = random(tree.leaves.filter(l => l.branch === clickedBranch));
+        if (leaf && !leaf.falling) {
+          leaf.falling = true;
+          leaf.fallSpeed = random(1, 2);
+        }
       }
     }
   } else {
@@ -532,8 +545,10 @@ function updateTooltip() {
     tree.state.tooltip.html(`<strong>${b.label}</strong>`);
     tree.state.tooltip.position(b.clickBox.x + b.clickBox.w/2, b.clickBox.y - 30);
     tree.state.tooltip.show();
+    cursor('pointer');
   } else {
     tree.state.tooltip.hide();
+    cursor('default');
   }
 }
 

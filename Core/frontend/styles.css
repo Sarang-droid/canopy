@@ -42,13 +42,12 @@ body {
 
 .branch-tooltip {
     position: absolute;
-    background: rgba(30, 30, 30, 0.8);
-    color: #f0f0f0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
     padding: 5px 10px;
     border-radius: 5px;
-    font-size: 12px;
     pointer-events: none;
-}
+  }
 
 /* Department-specific styles */
 .department-branded {
