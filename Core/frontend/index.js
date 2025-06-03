@@ -479,10 +479,10 @@ function mousePressed() {
   
   if (clickedBranch !== null) {
     if (branchData[clickedBranch].label === "Canopy") {
-      // Use an absolute path for redirection
+      // Redirect to access page instead of directly to Canopy.html
       const path = window.location.pathname;
       const base = path.substring(0, path.lastIndexOf('/') + 1);
-      window.location.href = base + '../branches/canopy/frontend/Canopy.html';
+      window.location.href = base + '../branches/canopy/frontend/Canopy-access.html';
       return;
     } else {
       tree.state.selectedBranch = clickedBranch;

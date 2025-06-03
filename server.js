@@ -9,6 +9,7 @@ const requestLogger = require('./shared/middleware/requestLogger');
 // Core routes
 const coreRoutes = require('./Core/backend/routes/indexRoutes');
 const authRoutes = require('./Core/backend/routes/authRoutes');
+const branchAuthRoutes = require('./branches/canopy/backend/routes/branchAuthRoutes');
 
 const app = express();
 
@@ -34,6 +35,7 @@ const authMiddleware = (req, res, next) => {
 
 // Static files and frontend
 app.use(express.static(path.join(__dirname, 'Core/frontend')));
+app.use('/branches/canopy/frontend', express.static(path.join(__dirname, 'branches/canopy/frontend')));
 
 // Routes for static files
 app.get('/register.html', (req, res) => {
@@ -49,8 +51,18 @@ app.get('/index.html', authMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'Core/frontend', 'index.html'));
 });
 
-// Public route for Canopy branch
-app.get('/branches/canopy/frontend/Canopy.html', (req, res) => {
+// Public route for Canopy access page
+app.get('/branches/canopy/frontend/Canopy-access.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'branches/canopy/frontend', 'Canopy-access.html'));
+});
+
+// Protected route for Canopy branch (requires authentication)
+app.get('/branches/canopy/frontend/Canopy.html', authMiddleware, (req, res) => {
+    // Check if user has canopy access
+    if (!req.cookies.canopyAccess) {
+        res.redirect('/branches/canopy/frontend/Canopy-access.html');
+        return;
+    }
     res.sendFile(path.join(__dirname, 'branches/canopy/frontend', 'Canopy.html'));
 });
 
@@ -67,10 +79,7 @@ app.get('*', (req, res) => {
 // API routes
 app.use('/api/core/auth', authRoutes);
 app.use('/api/core', coreRoutes);
-
-// API routes
-app.use('/api/core/auth', authRoutes);
-app.use('/api/core', coreRoutes);
+app.use('/api/canopy/auth', branchAuthRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
