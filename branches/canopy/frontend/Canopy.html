@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canopy Branch Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Top Navigation */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            display: none;
+        }
+
+        .nav-tab-label {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #f8f9fa;
+            color: #6c757d;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 2px solid transparent;
+        }
+
+        .nav-tab-label:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab:checked + .nav-tab-label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 1.5rem 2rem;
+            background: white;
+            margin: 0 2rem;
+            margin-top: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .branch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        /* Branch Cards */
+        .branch-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .branch-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .branch-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .branch-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .branch-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .technical .branch-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .financial .branch-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .marketing .branch-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .legal .branch-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .project .branch-icon { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .canopy .branch-icon { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+
+        /* Collapsible Details */
+        .branch-details {
+            cursor: pointer;
+        }
+
+        .branch-details summary {
+            list-style: none;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            color: #495057;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .branch-details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .branch-details summary::after {
+            content: '+';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .branch-details[open] summary::after {
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .branch-details summary:hover {
+            background: #e9ecef;
+        }
+
+        .sub-branches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .sub-branch {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sub-branch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Filter Logic */
+        .branch-card {
+            display: block;
+        }
+
+        #technical:checked ~ .main-content .branch-card:not(.technical),
+        #financial:checked ~ .main-content .branch-card:not(.financial),
+        #marketing:checked ~ .main-content .branch-card:not(.marketing),
+        #legal:checked ~ .main-content .branch-card:not(.legal),
+        #project:checked ~ .main-content .branch-card:not(.project),
+        #canopy:checked ~ .main-content .branch-card:not(.canopy) {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-tabs {
+                gap: 0.25rem;
+            }
+
+            .nav-tab-label {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .search-container {
+                margin: 0 1rem;
+                margin-top: 1rem;
+                padding: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .branch-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .branch-card {
+                padding: 1.5rem;
+            }
+
+            .branch-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-tabs {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .nav-tab-label {
+                white-space: nowrap;
+            }
+        }
+
+        /* Animation for initial load */
+        .branch-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .branch-card:nth-child(1) { animation-delay: 0.1s; }
+        .branch-card:nth-child(2) { animation-delay: 0.2s; }
+        .branch-card:nth-child(3) { animation-delay: 0.3s; }
+        .branch-card:nth-child(4) { animation-delay: 0.4s; }
+        .branch-card:nth-child(5) { animation-delay: 0.5s; }
+        .branch-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+            background: white;
+            margin: 1rem 2rem 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Filter Radio Buttons (Hidden) -->
+    <input type="radio" id="all" name="filter" class="nav-tab" checked>
+    <input type="radio" id="technical" name="filter" class="nav-tab">
+    <input type="radio" id="financial" name="filter" class="nav-tab">
+    <input type="radio" id="marketing" name="filter" class="nav-tab">
+    <input type="radio" id="legal" name="filter" class="nav-tab">
+    <input type="radio" id="project" name="filter" class="nav-tab">
+    <input type="radio" id="canopy" name="filter" class="nav-tab">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Canopy Branch Dashboard</h1>
+        <p>Explore all company branches and their specialized sub-branches</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-tabs">
+            <label for="all" class="nav-tab-label">
+                <i class="fas fa-th-large"></i> All Branches
+            </label>
+            <label for="technical" class="nav-tab-label">
+                <i class="fas fa-code"></i> Technical
+            </label>
+            <label for="financial" class="nav-tab-label">
+                <i class="fas fa-chart-line"></i> Financial
+            </label>
+            <label for="marketing" class="nav-tab-label">
+                <i class="fas fa-bullhorn"></i> Marketing
+            </label>
+            <label for="legal" class="nav-tab-label">
+                <i class="fas fa-gavel"></i> Legal & Compliance
+            </label>
+            <label for="project" class="nav-tab-label">
+                <i class="fas fa-project-diagram"></i> Project
+            </label>
+            <label for="canopy" class="nav-tab-label">
+                <i class="fas fa-tree"></i> Canopy
+            </label>
+        </div>
+    </nav>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search branch or sub-branch...">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="branch-grid">
+            <!-- Technical Branch -->
+            <div class="branch-card technical">
+                <div class="branch-title">
+                    <div class="branch-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    Technical Branch
+                </div>
+                <details class="branch-details">
+                    <summary>View Sub-Branches (4)</summary>
+                    <div class="sub-branches">
+                        <div class="sub-branch">Frontend</div>
+                        <div class="sub-branch">Backend</div>
+                        <div class="sub-branch">Security</div>
+                        <div class="sub-branch">DBMS</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Financial Branch -->
+            <div class="branch-card financial">
+                <div class="branch-title">
+                    <div class="branch-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    Financial Branch
+                </div>
+                <details class="branch-details">
+                    <summary>View Sub-Branches (7)</summary>
+                    <div class="sub-branches">
+                        <div class="sub-branch">Risk Management and Compliance</div>
+                        <div class="sub-branch">Financial Planning and Analysis</div>
+                        <div class="sub-branch">Corporate Finance</div>
+                        <div class="sub-branch">Payroll Management</div>
+                        <div class="sub-branch">Accounting and Bookkeeping</div>
+                        <div class="sub-branch">Treasury and Cash Management</div>
+                        <div class="sub-branch">Taxation</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Marketing Branch -->
+            <div class="branch-card marketing">
+                <div class="branch-title">
+                    <div class="branch-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    Marketing Branch
+                </div>
+                <details class="branch-details">
+                    <summary>View Sub-Branches (4)</summary>
+                    <div class="sub-branches">
+                        <div class="sub-branch">Digital Marketing</div>
+                        <div class="sub-branch">Branding and Communication</div>
+                        <div class="sub-branch">Product Marketing</div>
+                        <div class="sub-branch">Growth Marketing and Analytics</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Legal & Compliance Branch -->
+            <div class="branch-card legal">
+                <div class="branch-title">
+                    <div class="branch-icon">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    Legal & Compliance Branch
+                </div>
+                <details class="branch-details">
+                    <summary>View Sub-Branches (3)</summary>
+                    <div class="sub-branches">
+                        <div class="sub-branch">Intellectual Property Management</div>
+                        <div class="sub-branch">Contract Management</div>
+                        <div class="sub-branch">Regulatory Compliance</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Project Branch -->
+            <div class="branch-card project">
+                <div class="branch-title">
+                    <div class="branch-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    Project Branch
+                </div>
+                <details class="branch-details">
+                    <summary>View Sub-Branches (3)</summary>
+                    <div class="sub-branches">
+                        <div class="sub-branch">Client Relations Team (CRT)</div>
+                        <div class="sub-branch">Project Analysis Team (PAT)</div>
+                        <div class="sub-branch">Cost Estimation Team (CET)</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Canopy Branch -->
+            <div class="branch-card canopy">
+                <div class="branch-title">
+                    <div class="branch-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    Canopy Branch
+                </div>
+                <details class="branch-details">
+                    <summary>View Sub-Branches (2)</summary>
+                    <div class="sub-branches">
+                        <div class="sub-branch">Agent Branch</div>
+                        <div class="sub-branch">Development Branch</div>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+       
+        <script src="Canopy.js"></script>
+    </body>
+    </html>
