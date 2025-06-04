@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const branchAuthController = require('./controller/branchAuthController');
+const progenixRoutes = require('./routes/progenixRoutes');
 
 // Middleware to check Canopy access cookie
 const checkCanopyAccess = (req, res, next) => {
@@ -23,6 +24,9 @@ router.get('/dashboard', checkCanopyAccess, (req, res) => {
         user: req.user
     });
 });
+
+// Use progenix routes
+router.use('/agents/progenix', progenixRoutes);
 
 // Export routes
 module.exports = router;
