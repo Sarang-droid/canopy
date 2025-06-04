@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Top Navigation */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            display: none;
+        }
+
+        .nav-tab-label {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #f8f9fa;
+            color: #6c757d;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 2px solid transparent;
+        }
+
+        .nav-tab-label:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab:checked + .nav-tab-label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 1.5rem 2rem;
+            background: white;
+            margin: 0 2rem;
+            margin-top: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        /* Agent Cards */
+        .agent-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .agent-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .agent-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .agent-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .technical .agent-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .financial .agent-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .marketing .agent-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .legal .agent-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .project .agent-icon { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .canopy .agent-icon { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+
+        /* Collapsible Details */
+        .agent-details {
+            cursor: pointer;
+        }
+
+        .agent-details summary {
+            list-style: none;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            color: #495057;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .agent-details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .agents {
+            margin-top: 1rem;
+        }
+
+        .agent {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+
+        .agent:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Filter Radio Buttons (Hidden) -->
+    <input type="radio" id="all" name="filter" class="nav-tab" checked>
+    <input type="radio" id="technical" name="filter" class="nav-tab">
+    <input type="radio" id="financial" name="filter" class="nav-tab">
+    <input type="radio" id="marketing" name="filter" class="nav-tab">
+    <input type="radio" id="legal" name="filter" class="nav-tab">
+    <input type="radio" id="project" name="filter" class="nav-tab">
+    <input type="radio" id="canopy" name="filter" class="nav-tab">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Agent Dashboard</h1>
+        <p>Explore all agents and their specialized roles</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-tabs">
+            <label for="all" class="nav-tab-label">
+                <i class="fas fa-th-large"></i> All Agents
+            </label>
+            <label for="technical" class="nav-tab-label">
+                <i class="fas fa-code"></i> Technical
+            </label>
+            <label for="financial" class="nav-tab-label">
+                <i class="fas fa-chart-line"></i> Financial
+            </label>
+            <label for="marketing" class="nav-tab-label">
+                <i class="fas fa-bullhorn"></i> Marketing
+            </label>
+            <label for="legal" class="nav-tab-label">
+                <i class="fas fa-gavel"></i> Legal & Compliance
+            </label>
+            <label for="project" class="nav-tab-label">
+                <i class="fas fa-project-diagram"></i> Project
+            </label>
+            <label for="canopy" class="nav-tab-label">
+                <i class="fas fa-tree"></i> Canopy
+            </label>
+        </div>
+    </nav>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search agent or role...">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="agent-grid">
+            <!-- Technical Agents -->
+            <div class="agent-card technical">
+                <div class="agent-title">
+                    <div class="agent-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    Technical Agents
+                </div>
+                <details class="agent-details">
+                    <summary>View Agents (4)</summary>
+                    <div class="agents">
+                        <div class="agent">John Doe - Frontend Developer</div>
+                        <div class="agent">Jane Smith - Backend Developer</div>
+                        <div class="agent">Mike Johnson - Security Specialist</div>
+                        <div class="agent">Sarah Wilson - Database Administrator</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Financial Agents -->
+            <div class="agent-card financial">
+                <div class="agent-title">
+                    <div class="agent-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    Financial Agents
+                </div>
+                <details class="agent-details">
+                    <summary>View Agents (7)</summary>
+                    <div class="agents">
+                        <div class="agent">Robert Brown - Risk Manager</div>
+                        <div class="agent">Lisa Garcia - Financial Analyst</div>
+                        <div class="agent">David Kim - Corporate Finance</div>
+                        <div class="agent">Jennifer Chen - Payroll Specialist</div>
+                        <div class="agent">Mark Taylor - Accountant</div>
+                        <div class="agent">Emily Davis - Treasury Manager</div>
+                        <div class="agent">Thomas Wilson - Tax Consultant</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Marketing Agents -->
+            <div class="agent-card marketing">
+                <div class="agent-title">
+                    <div class="agent-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    Marketing Agents
+                </div>
+                <details class="agent-details">
+                    <summary>View Agents (4)</summary>
+                    <div class="agents">
+                        <div class="agent">Jessica Rodriguez - Digital Marketer</div>
+                        <div class="agent">Michael Thompson - Brand Manager</div>
+                        <div class="agent">Sarah Johnson - Product Marketer</div>
+                        <div class="agent">William Brown - Growth Analyst</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Legal Agents -->
+            <div class="agent-card legal">
+                <div class="agent-title">
+                    <div class="agent-icon">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    Legal Agents
+                </div>
+                <details class="agent-details">
+                    <summary>View Agents (3)</summary>
+                    <div class="agents">
+                        <div class="agent">Christopher Lee - IP Lawyer</div>
+                        <div class="agent">Victoria Davis - Contract Specialist</div>
+                        <div class="agent">Daniel Anderson - Compliance Officer</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Project Agents -->
+            <div class="agent-card project">
+                <div class="agent-title">
+                    <div class="agent-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    Project Agents
+                </div>
+                <details class="agent-details">
+                    <summary>View Agents (3)</summary>
+                    <div class="agents">
+                        <div class="agent">Ashley Wilson - Client Relations</div>
+                        <div class="agent">Matthew Brown - Project Analyst</div>
+                        <div class="agent">Sarah Johnson - Cost Estimator</div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Canopy Agents -->
+            <div class="agent-card canopy">
+                <div class="agent-title">
+                    <div class="agent-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    Canopy Agents
+                </div>
+                <details class="agent-details">
+                    <summary>View Agents (1)</summary>
+                    <div class="agents">
+                        <div class="agent">progenix</div>
+                       
+                    </div>
+                </details>
+            </div>
+        </div>
+    </main>
+
+    <script src="agent.js"></script>
+</body>
+</html>
