@@ -4,15 +4,47 @@ const { generateProjectIdeas } = require('../agents/progenixgpt');
 
 // Middleware to check Canopy access cookie
 const checkCanopyAccess = (req, res, next) => {
-    const token = req.cookies.canopyAccess;
-    if (!token) {
-        res.status(403).json({ 
+    try {
+        // Get cookie from headers
+        const cookieHeader = req.headers.cookie;
+        if (!cookieHeader) {
+            return res.status(403).json({ 
+                message: 'Access denied',
+                error: 'No cookies provided'
+            });
+        }
+
+        // Extract canopyAccess cookie
+        const cookies = cookieHeader.split('; ').map(c => c.trim());
+        const tokenCookie = cookies.find(cookie => cookie.startsWith('canopyAccess='));
+        if (!tokenCookie) {
+            return res.status(403).json({ 
+                message: 'Access denied',
+                error: 'Canopy access token required'
+            });
+        }
+
+        const token = tokenCookie.split('=')[1];
+        
+        // Verify JWT token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!decoded || !decoded.userId || decoded.department !== 'Canopy') {
+            return res.status(403).json({ 
+                message: 'Access denied',
+                error: 'Invalid access token'
+            });
+        }
+
+        // Add user info to request for use in routes
+        req.user = decoded;
+        next();
+    } catch (error) {
+        console.error('Access check error:', error);
+        return res.status(403).json({ 
             message: 'Access denied',
-            error: 'Canopy access token required'
+            error: 'Invalid or expired access token'
         });
-        return;
     }
-    next();
 };
 
 // Generate projects route

@@ -10,11 +10,16 @@ const requestLogger = require('./shared/middleware/requestLogger');
 const coreRoutes = require('./Core/backend/routes/indexRoutes');
 const authRoutes = require('./Core/backend/routes/authRoutes');
 const branchAuthRoutes = require('./branches/canopy/backend/routes/branchAuthRoutes');
+const progenixRoutes = require('./branches/canopy/backend/routes/progenixRoutes');
+const authCheckRoutes = require('./branches/canopy/backend/routes/authCheckRoutes');
 
 const app = express();
 
 // Middleware setup
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
@@ -80,6 +85,8 @@ app.get('*', (req, res) => {
 app.use('/api/core/auth', authRoutes);
 app.use('/api/core', coreRoutes);
 app.use('/api/canopy/auth', branchAuthRoutes);
+app.use('/api/canopy/auth', authCheckRoutes);
+app.use('/api/canopy/progenix', progenixRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

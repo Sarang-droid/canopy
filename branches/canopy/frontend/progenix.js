@@ -2,6 +2,22 @@
 let isGenerating = false;
 
 async function generateProjects() {
+    // Check if we have canopy access cookie
+    const cookies = document.cookie.split('; ').map(c => c.trim());
+    const hasAccess = cookies.some(cookie => cookie.startsWith('canopyAccess='));
+    
+    if (!hasAccess) {
+        // Try to get the cookie from the response headers
+        const response = await fetch('/api/canopy/auth/check-access', {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            showError('Access denied. Please log in to Canopy first.');
+            return;
+        }
+    }
+
     const jobTitle = document.getElementById('jobTitle').value.trim();
     const startBtn = document.querySelector('.start-btn');
     const loading = document.getElementById('loading');
@@ -30,10 +46,12 @@ async function generateProjects() {
 
     try {
         // Call backend API
-        const response = await fetch('/api/agents/progenix', {
+        const response = await fetch('/api/canopy/progenix/generate', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 jobTitle: jobTitle
@@ -48,7 +66,6 @@ async function generateProjects() {
 
         // Display results
         displayProjects(data.projects, data.insights);
-        
     } catch (err) {
         console.error('Error generating projects:', err);
         showError(err.message || 'Failed to generate projects. Please try again.');
