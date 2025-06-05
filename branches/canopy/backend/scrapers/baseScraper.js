@@ -53,13 +53,21 @@ class BaseScraper {
     }
 
     normalizeJob(job) {
+        // Ensure we have a proper object
+        if (!job) return null;
+        
+        // Ensure skills is always an array
+        const skills = Array.isArray(job.skills) ? job.skills : 
+            typeof job.skills === 'string' ? job.skills.split(',').map(skill => skill.trim()) :
+            [];
+
         return {
             title: job.title || '',
             company: job.company || '',
             location: job.location || '',
             description: job.description || '',
             salary: job.salary || '',
-            skills: job.skills || [],
+            skills: skills,
             source: job.source || this.config.name,
             url: job.url || '',
             timestamp: new Date().toISOString()

@@ -1,6 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const { generateProjectIdeas } = require('../agents/progenixgpt');
+const jwt = require('jsonwebtoken');
+
+// Load environment variables
+require('dotenv').config();
+
+// Ensure JWT_SECRET is set
+if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET must be set in environment variables');
+}
 
 // Middleware to check Canopy access cookie
 const checkCanopyAccess = (req, res, next) => {

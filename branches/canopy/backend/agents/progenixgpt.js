@@ -52,18 +52,22 @@ async function generateProjectIdeas(jobTitle, jobData) {
 
 // Helper function to prepare job data summary
 function prepareJobSummary(jobTitle, jobData) {
-    if (!jobData || jobData.length === 0) {
+    // If jobData is not an array or empty, return a basic summary
+    if (!Array.isArray(jobData) || jobData.length === 0) {
         return `Limited job data available for ${jobTitle}. Focus on general industry trends.`;
     }
 
     let summary = `Job Market Analysis for ${jobTitle}:\n\n`;
     
-    jobData.forEach((job, index) => {
+    // Convert to array if it's a single object
+    const jobs = Array.isArray(jobData) ? jobData : [jobData];
+    
+    jobs.forEach((job, index) => {
         summary += `Job ${index + 1}:\n`;
-        summary += `- Title: ${job.title}\n`;
-        summary += `- Company: ${job.company}\n`;
-        summary += `- Description: ${job.description}\n`;
-        summary += `- Required Skills: ${job.skills.join(', ')}\n\n`;
+        summary += `- Title: ${job.title || 'N/A'}\n`;
+        summary += `- Company: ${job.company || 'N/A'}\n`;
+        summary += `- Description: ${job.description || 'N/A'}\n`;
+        summary += `- Required Skills: ${Array.isArray(job.skills) ? job.skills.join(', ') : 'N/A'}\n\n`;
     });
 
     return summary;
