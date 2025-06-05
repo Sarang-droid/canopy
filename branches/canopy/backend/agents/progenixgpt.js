@@ -85,6 +85,8 @@ Each project should include:
 - Title (creative but professional)
 - Description (what problem it solves, why it's valuable)
 - Tech Stack (3-6 specific technologies)
+- Tasks (list of 5 tasks to complete the project)
+- Difficulty (level of difficulty on a scale of 1-5)
 
 Return your response as valid JSON in this exact format:
 {
@@ -92,18 +94,42 @@ Return your response as valid JSON in this exact format:
     "projects": [
         {
             "title": "Project Title",
-            "description": "Detailed description of what this project does and why it's valuable for getting hired",
-            "techStack": ["Tech1", "Tech2", "Tech3", "Tech4"]
+            "description": "Detailed description of what this project does and why it's valuable",
+            "techStack": ["Tech1", "Tech2", "Tech3", "Tech4"],
+            "tasks": [
+                "Task 1: Set up project structure and dependencies",
+                "Task 2: Implement core functionality",
+                "Task 3: Add user authentication",
+                "Task 4: Implement API endpoints",
+                "Task 5: Add testing and documentation"
+            ],
+            "difficulty": 3
         },
         {
             "title": "Project Title 2", 
             "description": "Another project description",
-            "techStack": ["Tech1", "Tech2", "Tech3"]
+            "techStack": ["Tech1", "Tech2", "Tech3"],
+            "tasks": [
+                "Task 1: Set up project structure and dependencies",
+                "Task 2: Implement core functionality",
+                "Task 3: Add user authentication",
+                "Task 4: Implement API endpoints",
+                "Task 5: Add testing and documentation"
+            ],
+            "difficulty": 3
         },
         {
             "title": "Project Title 3",
             "description": "Third project description", 
-            "techStack": ["Tech1", "Tech2", "Tech3", "Tech4"]
+            "techStack": ["Tech1", "Tech2", "Tech3", "Tech4"],
+            "tasks": [
+                "Task 1: Set up project structure and dependencies",
+                "Task 2: Implement core functionality",
+                "Task 3: Add user authentication",
+                "Task 4: Implement API endpoints",
+                "Task 5: Add testing and documentation"
+            ],
+            "difficulty": 3
         }
     ]
 }
@@ -223,17 +249,41 @@ function getFallbackResponse(jobTitle) {
             {
                 title: `Portfolio Website for ${jobTitle}`,
                 description: "Create a professional portfolio showcasing your skills, projects, and experience. Include responsive design, performance optimization, and modern development practices.",
-                techStack: ["HTML5", "CSS3", "JavaScript", "Git", "Deployment"]
+                techStack: ["HTML5", "CSS3", "JavaScript", "Git", "Deployment"],
+                tasks: [
+                    "Set up project structure and version control",
+                    "Design responsive layout and user interface",
+                    "Implement project showcase and documentation",
+                    "Optimize performance and accessibility",
+                    "Deploy to production environment"
+                ],
+                difficulty: 2
             },
             {
                 title: `Industry-Specific Tool for ${jobTitle}`,
                 description: "Build a specialized tool that solves a common problem in your industry. This demonstrates domain knowledge and practical application of technical skills.",
-                techStack: ["Modern Framework", "Database", "API Integration", "Testing"]
+                techStack: ["Modern Framework", "Database", "API Integration", "Testing"],
+                tasks: [
+                    "Define problem statement and requirements",
+                    "Design system architecture",
+                    "Implement core functionality",
+                    "Add testing and error handling",
+                    "Deploy and document API"
+                ],
+                difficulty: 3
             },
             {
                 title: `Automation Solution for ${jobTitle}`,
                 description: "Develop an automation tool that streamlines repetitive tasks in your field. Shows efficiency mindset and technical problem-solving abilities.",
-                techStack: ["Scripting Language", "APIs", "Scheduling", "Monitoring"]
+                techStack: ["Scripting Language", "APIs", "Scheduling", "Monitoring"],
+                tasks: [
+                    "Identify automation opportunities",
+                    "Design workflow and data processing",
+                    "Implement automation scripts",
+                    "Add monitoring and error handling",
+                    "Create deployment scripts"
+                ],
+                difficulty: 3
             }
         ]
     };
