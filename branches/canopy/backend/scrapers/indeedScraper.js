@@ -24,7 +24,9 @@ class IndeedScraper extends BaseScraper {
             const url = `${this.config.baseUrl}/jobs?q=${encodeURIComponent(query)}&l=${encodeURIComponent(location)}&start=${page * 10}`;
             const $ = await this.fetchPage(url);
 
-            $(this.config.selectors.jobCards).each((i, card) => {
+            const jobCards = $(this.config.selectors.jobCards);
+            for (let i = 0; i < jobCards.length; i++) {
+                const card = jobCards[i];
                 const job = {
                     title: $(card).find(this.config.selectors.title).text().trim(),
                     company: $(card).find(this.config.selectors.company).text().trim(),
@@ -36,9 +38,11 @@ class IndeedScraper extends BaseScraper {
                 };
 
                 if (job.title && job.description) {
+                    // Extract skills from description
+                    job.skills = await this.extractSkills(job.description);
                     jobs.push(this.normalizeJob(job));
                 }
-            });
+            }
         }
 
         await this.close();

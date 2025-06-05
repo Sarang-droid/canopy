@@ -105,42 +105,79 @@ function hideError() {
 }
 
 function displayProjects(projects, insights) {
-    const projectsList = document.getElementById('projectsList');
-    
-    let html = '';
-    
-    // Add insights section if available
-    if (insights && insights.length > 0) {
-        html += `
-            <div class="insights-section" style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #4facfe10, #00f2fe10); border-radius: 15px;">
-                <h3 style="color: #4facfe; margin-bottom: 15px;">🔍 Market Insights</h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                    ${insights.map(insight => `<span class="tech-tag">${insight}</span>`).join('')}
-                </div>
-            </div>
-        `;
+    // Display job data
+    const jobDataContainer = document.getElementById('job-data-container');
+    if (jobDataContainer) {
+        jobDataContainer.innerHTML = '';
     }
-    
-    // Add projects
-    projects.forEach((project, index) => {
-        html += `
-            <div class="project-card">
-                <div class="project-title">${project.title}</div>
-                <div class="project-description">${project.description}</div>
-                <div style="margin-top: 15px;">
-                    <strong style="color: #333; display: block; margin-bottom: 8px;">Recommended Tech Stack:</strong>
-                    <div class="tech-stack">
-                        ${project.techStack.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
-                    </div>
+
+    // Update total jobs
+    const totalJobsElement = document.getElementById('total-jobs');
+    if (totalJobsElement) {
+        totalJobsElement.textContent = insights.totalJobs;
+    }
+
+    // Display top skills
+    const topSkillsElement = document.getElementById('top-skills');
+    if (topSkillsElement) {
+        topSkillsElement.innerHTML = insights.topSkills.map(skill => `
+            <span class="skill-tag">${skill.skill} (${skill.count})</span>
+        `).join('');
+    }
+
+    // Display sample jobs
+    const jobListElement = document.getElementById('job-list');
+    if (jobListElement) {
+        jobListElement.innerHTML = insights.sampleJobs.map(job => `
+            <div class="job-item">
+                <h3>${job.title}</h3>
+                <p><strong>Company:</strong> ${job.company}</p>
+                <p><strong>Location:</strong> ${job.location}</p>
+                <div class="skills">
+                    ${job.skills.map(skill => `
+                        <span class="job-skill">${skill}</span>
+                    `).join('')}
                 </div>
+                <p><strong>Description:</strong> ${job.description}</p>
             </div>
-        `;
-    });
-    
-    projectsList.innerHTML = html;
+        `).join('');
+    }
+
+    // Display projects
+    const projectsContainer = document.getElementById('projects-container');
+    if (projectsContainer) {
+        projectsContainer.innerHTML = '';
+        projects.forEach(project => {
+            const projectCard = document.createElement('div');
+            projectCard.className = 'project-card';
+            
+            projectCard.innerHTML = `
+                <h3 class="project-title">${project.title}</h3>
+                <p class="project-description">${project.description}</p>
+                <div class="tech-stack">
+                    ${project.techStack.map(tech => `
+                        <span class="tech-tag">${tech}</span>
+                    `).join('')}
+                </div>
+            `;
+
+            projectsContainer.appendChild(projectCard);
+        });
+    }
+
     showResults();
-    
-    // Smooth scroll to results
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('error');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+}
+
+// Smooth scroll to results
+function scrollToResults() {
     document.getElementById('results').scrollIntoView({ 
         behavior: 'smooth', 
         block: 'start' 

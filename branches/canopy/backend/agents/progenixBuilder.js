@@ -73,6 +73,21 @@ async function buildProjects(req, res) {
         // Generate project ideas using GPT
         const result = await generateProjectIdeas(jobTitle, jobs);
 
+        // Log job data for debugging
+        console.log(`🔍 Job Market Analysis for "${jobTitle}":`);
+        console.log(`- Total Jobs Found: ${jobs.length}`);
+        console.log(`- Top Skills:`, analysis.insights.topSkills);
+        console.log(`- Sample Job Titles:`, jobs.slice(0, 3).map(job => job.title));
+
+        // Get sample jobs (first 5 jobs)
+        const sampleJobs = jobs.slice(0, 5).map(job => ({
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            description: job.description,
+            skills: job.skills
+        }));
+
         // Save projects to MongoDB
         const projects = result.projects.map(project => ({
             companyId: mongoose.Types.ObjectId(),
@@ -99,15 +114,21 @@ async function buildProjects(req, res) {
                 },
                 {
                     name: "Tech Documentation",
-                    url: "https://docs.progenix.ai",
-                    description: "Detailed documentation for all technologies"
+                    url: "https://docs.github.com",
+                    description: "Official documentation for GitHub"
                 }
             ]
         }));
 
-        const savedProjects = await Project.insertMany(projects);
-
-        console.log(`✅ Progenix: Successfully generated and saved ${savedProjects.length} projects`);
+        // Save to database
+        try {
+            const savedProjects = await Project.insertMany(projects);
+            console.log(`✅ Progenix: Successfully generated and saved ${savedProjects.length} projects`);
+            console.log('Projects saved:', savedProjects.map(p => ({ title: p.title, id: p._id })));
+        } catch (error) {
+            console.error('Error saving projects to database:', error);
+            throw error;
+        }
 
         return res.status(200).json({
             success: true,
@@ -115,7 +136,12 @@ async function buildProjects(req, res) {
             location: location,
             projects: savedProjects,
             insights: {
-                topSkills: analysis.insights.topSkills,
+                totalJobs: jobs.length,
+                topSkills: Object.entries(analysis.insights.topSkills)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10)
+                    .map(([skill, count]) => ({ skill, count })),
+                sampleJobs: sampleJobs,
                 salaryRanges: analysis.insights.salaryRanges,
                 locations: analysis.insights.locations,
                 companies: analysis.insights.companies
