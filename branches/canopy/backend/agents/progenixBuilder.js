@@ -1,21 +1,14 @@
-// Progenix Builder - Backend Controller
 const { generateProjectIdeas } = require('./progenixgpt');
 const ScraperManager = require('../scrapers/scraperManager');
 const mongoose = require('mongoose');
 const OpenAI = require('openai');
 
-// Initialize OpenAI
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
-// Project schema
 const ProjectSchema = new mongoose.Schema({
-    companyId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Company',
-        required: true
-    },
+    companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
     companyType: { type: String, required: true },
     projectId: { type: String, required: true },
     title: { type: String, required: true },
@@ -38,22 +31,16 @@ const ProjectSchema = new mongoose.Schema({
     }],
     status: { type: String, default: 'active' },
     applicants: { type: Number, default: 0 },
-    completedBy: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: []
-    }],
+    completedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
 
-// Project model
 const Project = mongoose.model('Project', ProjectSchema);
 
-// Main controller function
 async function buildProjects(req, res) {
     try {
-        const { jobTitle, location = 'India' } = req.body;
+        const { jobTitle, location = 'India', pages = 2 } = req.body;
 
         if (!jobTitle) {
             return res.status(400).json({
@@ -64,22 +51,26 @@ async function buildProjects(req, res) {
 
         console.log(`🤖 Progenix: Generating projects for "${jobTitle}" in ${location}`);
 
-        // Initialize scraper manager
         const scraperManager = new ScraperManager();
-        
-        // Scrape job data
-        const { jobs, analysis } = await scraperManager.scrapeJobs(jobTitle, location, 2);
+        const { jobs, analysis } = await scraperManager.scrapeJobs(jobTitle, location, pages);
+
+        // Validate scraped data
+        if (jobs.length < 5) {
+            console.warn(`Insufficient data: Only ${jobs.length} jobs found for "${jobTitle}"`);
+            return res.status(400).json({
+                success: false,
+                message: `Insufficient job data: Only ${jobs.length} jobs found. Try a broader job title or location.`
+            });
+        }
 
         // Generate project ideas using GPT
-        const result = await generateProjectIdeas(jobTitle, jobs);
+        const result = await generateProjectIdeas(jobTitle, { jobs, analysis });
 
-        // Log job data for debugging
         console.log(`🔍 Job Market Analysis for "${jobTitle}":`);
         console.log(`- Total Jobs Found: ${jobs.length}`);
         console.log(`- Top Skills:`, analysis.insights.topSkills);
         console.log(`- Sample Job Titles:`, jobs.slice(0, 3).map(job => job.title));
 
-        // Get sample jobs (first 5 jobs)
         const sampleJobs = jobs.slice(0, 5).map(job => ({
             title: job.title,
             company: job.company,
@@ -88,9 +79,8 @@ async function buildProjects(req, res) {
             skills: job.skills
         }));
 
-        // Save projects to MongoDB
         const projects = result.projects.map(project => ({
-            companyId: mongoose.Types.ObjectId(),
+            companyId: new mongoose.Types.ObjectId(),
             companyType: "progenix",
             projectId: `PROJ-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             title: project.title,
@@ -98,7 +88,7 @@ async function buildProjects(req, res) {
             industry: jobTitle,
             projectType: "technical",
             preferredSkills: project.techStack,
-            minExperienceRequired: 1,
+            minExperienceRequired: project.difficulty > 3 ? 2 : 1,
             tasks: project.tasks.map(task => ({
                 taskId: `TASK-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 taskName: task,
@@ -120,15 +110,9 @@ async function buildProjects(req, res) {
             ]
         }));
 
-        // Save to database
-        try {
-            const savedProjects = await Project.insertMany(projects);
-            console.log(`✅ Progenix: Successfully generated and saved ${savedProjects.length} projects`);
-            console.log('Projects saved:', savedProjects.map(p => ({ title: p.title, id: p._id })));
-        } catch (error) {
-            console.error('Error saving projects to database:', error);
-            throw error;
-        }
+        const savedProjects = await Project.insertMany(projects);
+        console.log(`✅ Progenix: Successfully generated and saved ${savedProjects.length} projects`);
+        console.log('Projects saved:', savedProjects.map(p => ({ title: p.title, id: p._id })));
 
         return res.status(200).json({
             success: true,
@@ -137,10 +121,7 @@ async function buildProjects(req, res) {
             projects: savedProjects,
             insights: {
                 totalJobs: jobs.length,
-                topSkills: Object.entries(analysis.insights.topSkills)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 10)
-                    .map(([skill, count]) => ({ skill, count })),
+                topSkills: analysis.insights.topSkills,
                 sampleJobs: sampleJobs,
                 salaryRanges: analysis.insights.salaryRanges,
                 locations: analysis.insights.locations,
@@ -148,10 +129,8 @@ async function buildProjects(req, res) {
             },
             timestamp: new Date().toISOString()
         });
-
     } catch (error) {
         console.error('❌ Progenix Error:', error.message);
-        
         return res.status(500).json({
             success: false,
             message: 'Failed to generate projects. Please try again.',
