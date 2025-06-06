@@ -105,31 +105,64 @@ function hideError() {
 }
 
 function displayProjects(projects, insights) {
-    // Display job data
-    const jobDataContainer = document.getElementById('job-data-container');
-    if (jobDataContainer) {
-        jobDataContainer.innerHTML = '';
-    }
-
-    // Update total jobs
+    // Display job market analysis
     const totalJobsElement = document.getElementById('total-jobs');
     if (totalJobsElement) {
-        totalJobsElement.textContent = insights.totalJobs;
+        totalJobsElement.textContent = insights?.totalJobs || 0;
     }
 
     // Display top skills
     const topSkillsElement = document.getElementById('top-skills');
-    if (topSkillsElement) {
+    if (topSkillsElement && insights?.topSkills) {
         topSkillsElement.innerHTML = insights.topSkills.map(skill => `
             <span class="skill-tag">${skill.skill} (${skill.count})</span>
         `).join('');
     }
 
+    // Display salary ranges
+    const salaryRangesElement = document.getElementById('salary-ranges');
+    if (salaryRangesElement && insights?.salaryRanges) {
+        salaryRangesElement.innerHTML = insights.salaryRanges.map(range => `
+            <div class="stat-item">
+                <span>${range.range}</span>
+                <span>${range.count} jobs</span>
+            </div>
+        `).join('');
+    }
+
+    // Display locations
+    const locationsElement = document.getElementById('locations');
+    if (locationsElement && insights?.locations) {
+        locationsElement.innerHTML = Object.entries(insights.locations)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([location, count]) => `
+                <div class="stat-item">
+                    <span>${location}</span>
+                    <span>${count} jobs</span>
+                </div>
+            `).join('');
+    }
+
+    // Display companies
+    const companiesElement = document.getElementById('companies');
+    if (companiesElement && insights?.companies) {
+        companiesElement.innerHTML = Object.entries(insights.companies)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([company, count]) => `
+                <div class="stat-item">
+                    <span>${company}</span>
+                    <span>${count} jobs</span>
+                </div>
+            `).join('');
+    }
+
     // Display sample jobs
     const jobListElement = document.getElementById('job-list');
-    if (jobListElement) {
+    if (jobListElement && insights?.sampleJobs) {
         jobListElement.innerHTML = insights.sampleJobs.map(job => `
-            <div class="job-item">
+            <div class="job-card">
                 <h3>${job.title}</h3>
                 <p><strong>Company:</strong> ${job.company}</p>
                 <p><strong>Location:</strong> ${job.location}</p>
@@ -138,7 +171,7 @@ function displayProjects(projects, insights) {
                         <span class="job-skill">${skill}</span>
                     `).join('')}
                 </div>
-                <p><strong>Description:</strong> ${job.description}</p>
+                <p>${job.description}</p>
             </div>
         `).join('');
     }
@@ -152,8 +185,8 @@ function displayProjects(projects, insights) {
             projectCard.className = 'project-card';
             
             projectCard.innerHTML = `
-                <h3 class="project-title">${project.title}</h3>
-                <p class="project-description">${project.description}</p>
+                <h3>${project.title}</h3>
+                <p>${project.description}</p>
                 <div class="tech-stack">
                     ${project.techStack.map(tech => `
                         <span class="tech-tag">${tech}</span>
@@ -166,14 +199,6 @@ function displayProjects(projects, insights) {
     }
 
     showResults();
-}
-
-function showError(message) {
-    const errorDiv = document.getElementById('error');
-    if (errorDiv) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-    }
 }
 
 // Smooth scroll to results

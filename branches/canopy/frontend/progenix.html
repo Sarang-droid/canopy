@@ -490,38 +490,220 @@
                 </button>
             </div>
 
+            <div class="error" id="error" style="display: none;">
+                <p id="error-message"></p>
+            </div>
+
             <div class="loading" id="loading">
                 <div class="spinner"></div>
                 <p>Progenix is analyzing job market trends and generating personalized projects...</p>
             </div>
 
             <div id="results" style="display: none;">
-                <div class="job-data-section">
-                <h2>Job Market Analysis</h2>
-                <div id="job-data-container">
-                    <div class="job-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Total Jobs Found</span>
-                            <span class="stat-value" id="total-jobs">0</span>
+                <div class="analysis-container">
+                    <div class="market-analysis">
+                        <h2>Job Market Analysis</h2>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3>Total Jobs Found</h3>
+                                <div class="stat-value" id="total-jobs">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Top Skills</h3>
+                                <div id="top-skills" class="skills-list"></div>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Top Skills</span>
-                            <div id="top-skills" class="skills-list"></div>
+                        <div class="salary-stats">
+                            <h3>Salary Ranges</h3>
+                            <div id="salary-ranges" class="ranges-list"></div>
+                        </div>
+                        <div class="location-stats">
+                            <h3>Popular Locations</h3>
+                            <div id="locations" class="locations-list"></div>
+                        </div>
+                        <div class="company-stats">
+                            <h3>Top Companies</h3>
+                            <div id="companies" class="companies-list"></div>
                         </div>
                     </div>
-                    <div class="job-list" id="job-list-container">
-                        <h3>Sample Job Listings</h3>
-                        <div id="job-list" class="job-listings"></div>
+                    <div class="job-listings">
+                        <h2>Sample Job Listings</h2>
+                        <div id="job-list" class="jobs-grid"></div>
                     </div>
+                </div>
+                
+                <div class="projects-section">
+                    <h2>Generated Projects</h2>
+                    <div id="projects-container" class="projects-grid"></div>
                 </div>
             </div>
 
-            <div class="error" id="error" style="display: none;"></div>
+            <style>
+                .error {
+                    display: none;
+                    padding: 15px;
+                    background: #fff0f0;
+                    border: 1px solid #ff6b6b;
+                    border-radius: 8px;
+                    margin: 20px 0;
+                    color: #ff6b6b;
+                }
+            </style>
+
+            <style>
+                .analysis-container {
+                    margin-bottom: 40px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                }
+
+                .market-analysis {
+                    margin-bottom: 40px;
+                }
+
+                .stats-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 30px;
+                }
+
+                .stat-card {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                }
+
+                .stat-card h3 {
+                    color: #333;
+                    margin: 0 0 10px 0;
+                    font-size: 1.2em;
+                }
+
+                .stat-value {
+                    font-size: 2em;
+                    font-weight: bold;
+                    color: #1a73e8;
+                    text-align: center;
+                }
+
+                .skills-list {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin-top: 10px;
+                }
+
+                .skill-tag {
+                    background: #e9f3ff;
+                    padding: 8px 15px;
+                    border-radius: 15px;
+                    font-size: 0.9em;
+                    color: #1a73e8;
+                    font-weight: 500;
+                }
+
+                .ranges-list, .locations-list, .companies-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    margin-top: 10px;
+                }
+
+                .stat-item {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 15px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                }
+
+                .jobs-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 20px;
+                }
+
+                .job-card {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                }
+
+                .job-card h3 {
+                    margin: 0 0 10px 0;
+                    color: #333;
+                }
+
+                .job-card p {
+                    margin: 5px 0;
+                    color: #666;
+                }
+
+                .job-card .skills {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 5px;
+                    margin-top: 10px;
+                }
+
+                .job-skill {
+                    background: #f0f0f0;
+                    padding: 3px 8px;
+                    border-radius: 15px;
+                    font-size: 0.8em;
+                    color: #666;
+                }
+
+                .projects-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 20px;
+                }
+
+                .project-card {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                    transition: transform 0.2s ease-in-out;
+                }
+
+                .project-card:hover {
+                    transform: translateY(-5px);
+                }
+
+                .project-card h3 {
+                    margin: 0 0 10px 0;
+                    color: #1a73e8;
+                }
+
+                .project-card p {
+                    margin: 5px 0;
+                    color: #666;
+                }
+
+                .tech-stack {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin-top: 15px;
+                }
+
+                .tech-tag {
+                    background: #e9f3ff;
+                    padding: 5px 12px;
+                    border-radius: 15px;
+                    font-size: 0.85em;
+                    color: #1a73e8;
+                }
+            </style>
 
             <script src="progenix.js"></script>
         </div>
     </body>
 </html>
-        </div>
-
-    
