@@ -1,5 +1,6 @@
 const IndeedScraper = require('./indeedScraper');
 const JSearchScraper = require('./jsearchScraper');
+const { exportJobsToExcel } = require('../utils/excelUtils');
 
 class ScraperManager {
     constructor() {
@@ -56,6 +57,17 @@ class ScraperManager {
             console.log(`✅ Saved ${jobs.length} jobs to ${filename}`);
         } catch (error) {
             console.error('❌ Error saving to CSV:', error);
+        }
+    }
+
+    async saveToExcel(jobs, filename = 'scraped_jobs.xlsx') {
+        try {
+            const filePath = await exportJobsToExcel(jobs, filename);
+            console.log(`✅ Excel file created: ${filePath}`);
+            return filePath;
+        } catch (error) {
+            console.error('❌ Error saving to Excel:', error.message);
+            throw error;
         }
     }
 

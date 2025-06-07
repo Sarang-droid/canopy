@@ -12,6 +12,7 @@ const authRoutes = require('./Core/backend/routes/authRoutes');
 const branchAuthRoutes = require('./branches/canopy/backend/routes/branchAuthRoutes');
 const progenixRoutes = require('./branches/canopy/backend/routes/progenixRoutes');
 const authCheckRoutes = require('./branches/canopy/backend/routes/authCheckRoutes');
+const jobRoutes = require('./branches/canopy/backend/routes/jobRoutes');
 
 const app = express();
 
@@ -87,6 +88,7 @@ app.use('/api/core', coreRoutes);
 app.use('/api/canopy/auth', branchAuthRoutes);
 app.use('/api/canopy/auth', authCheckRoutes);
 app.use('/api/canopy/progenix', progenixRoutes);
+app.use('/api/jobs', jobRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
