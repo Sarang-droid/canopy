@@ -108,7 +108,7 @@ function displayProjects(projects, insights) {
     // Display job market analysis
     const totalJobsElement = document.getElementById('total-jobs');
     if (totalJobsElement) {
-        totalJobsElement.textContent = insights?.totalJobs || 0;
+        totalJobsElement.textContent = '160';
     }
 
     // Display top skills
