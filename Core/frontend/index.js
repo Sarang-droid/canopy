@@ -1,6 +1,41 @@
 // Add click handlers for navigation buttons
 document.querySelectorAll('.nav-button').forEach(button => {
-  button.addEventListener('click', function() {
+  button.addEventListener('click', function(event) {
+    // Handle Canopy Agents dropdown
+    if (this.nextElementSibling?.classList.contains('dropdown-menu')) {
+      event.preventDefault();
+      const dropdown = this.nextElementSibling;
+      const isActive = dropdown.classList.contains('hidden');
+      
+      // Close all other dropdowns
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        if (menu !== dropdown) {
+          menu.classList.add('hidden');
+        }
+      });
+      
+      // Toggle this dropdown
+      dropdown.classList.toggle('hidden');
+      
+      // Add ripple effect
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 1000);
+      
+      return;
+    }
+    
     // Remove active class from all buttons
     document.querySelectorAll('.nav-button').forEach(btn => {
       btn.classList.remove('active');
@@ -13,22 +48,16 @@ document.querySelectorAll('.nav-button').forEach(button => {
     
     // Smooth transition animation
     this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-    
-    // Add ripple effect
-    const ripple = document.createElement('span');
-    ripple.classList.add('ripple');
-    this.appendChild(ripple);
-    
-    const rect = this.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    
-    ripple.style.left = `${x}px`;
-    ripple.style.top = `${y}px`;
-    
-    setTimeout(() => {
-      ripple.remove();
-    }, 1000);
+  });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  const dropdowns = document.querySelectorAll('.dropdown-menu');
+  dropdowns.forEach(dropdown => {
+    if (!dropdown.contains(event.target) && !dropdown.previousElementSibling.contains(event.target)) {
+      dropdown.classList.add('hidden');
+    }
   });
 });
 

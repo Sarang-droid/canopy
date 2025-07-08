@@ -72,16 +72,84 @@
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Finance (CCFM)</p>
                   </button>
-                  <button class="nav-button flex items-center gap-3 px-3 py-2 rounded-xl">
-                    <div class="text-white" data-icon="Brain" data-size="24px" data-weight="regular">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                        <path
-                          d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124ZM88,208a32,32,0,0,1-31.81-28.56A55.87,55.87,0,0,0,64,180h8a8,8,0,0,0,0-16H64A40,40,0,0,1,50.67,86.27A8,8,0,0,0,56,78.73V72a32,32,0,0,1,64,0v68.26A47.8,47.8,0,0,0,88,128a8,8,0,0,0,0,16,32,32,0,0,1,0,64Zm104-44h-8a8,8,0,0,0,0,16h8a55.87,55.87,0,0,0,7.81-.56A32,32,0,1,1,168,144a8,8,0,0,0,0-16,47.8,47.8,0,0,0-32,12.26V72a32,32,0,0,1,64,0v6.73a8,8,0,0,0,5.33,7.54A40,40,0,0,1,192,164Zm16-52a8,8,0,0,1-8,8h-4a36,36,0,0,1-36-36V80a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4A8,8,0,0,1,208,112ZM60,120H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,84V80a8,8,0,0,1,16,0v4A36,36,0,0,1,60,120Z"
-                        ></path>
-                      </svg>
+                  <div class="relative">
+                    <button class="nav-button flex items-center gap-3 px-3 py-2 rounded-xl">
+                      <div class="text-white" data-icon="Users" data-size="24px" data-weight="regular">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                          <path
+                            d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,0,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"
+                          ></path>
+                        </svg>
+                      </div>
+                      <p class="text-white text-sm font-medium leading-normal">Canopy Agents</p>
+                      <div class="text-white" data-icon="CaretDown" data-size="16px" data-weight="regular">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="currentColor" viewBox="0 0 256 256">
+                          <path d="M128,224a8,8,0,0,1-8-8L120,128,64,80a8,8,0,0,1,11.31-11.31l54.7,54.7a8,8,0,0,1,0,11.31l54.7-54.7a8,8,0,0,1,11.31,11.31L136,128Z"></path>
+                        </svg>
+                      </div>
+                    </button>
+                    <div class="dropdown-menu hidden absolute left-0 top-full mt-2 w-64 bg-[#131516] rounded-xl border border-[#41484e]">
+                      <div class="p-4">
+                        <div class="space-y-4">
+                          <div class="flex items-center gap-3">
+                            <div class="text-white" data-icon="ChartBar" data-size="20px" data-weight="regular">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M224,48H32a8,8,0,0,0-8,8V184a8,8,0,0,0,8,8H224a8,8,0,0,0,8-8V56A8,8,0,0,0,224,48Zm-16,120H48V56H208Z"></path>
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 class="text-white font-medium">📊 Graph Analyzer Agent</h3>
+                              <p class="text-[#a3acb2] text-sm">Descriptive, neutral, and simple</p>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-3">
+                            <div class="text-white" data-icon="Brain" data-size="20px" data-weight="regular">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124Z"></path>
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 class="text-white font-medium">🧠 Insight Agent</h3>
+                              <p class="text-[#a3acb2] text-sm">Suggests intelligence, pattern recognition</p>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-3">
+                            <div class="text-white" data-icon="ChartLine" data-size="20px" data-weight="regular">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M224,208H32a8,8,0,0,1-8-8V48a8,8,0,0,1,8-8H224a8,8,0,0,1,8,8V200A8,8,0,0,1,224,208Zm0-96H32V56a8,8,0,0,1,8-8H216a8,8,0,0,1,8,8Z"></path>
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 class="text-white font-medium">📈 Data Interpreter Agent</h3>
+                              <p class="text-[#a3acb2] text-sm">Focus on explaining data, good for cross-branch use</p>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-3">
+                            <div class="text-white" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M221.74,212.74a8,8,0,0,1-11.32,11.32l-40-40a8,8,0,0,1,0-11.32l40-40a8,8,0,1,1,11.32,11.32l-28.28,28.28A136,136,0,1,0,221.74,212.74ZM184,112a72,72,0,1,1-72,72A72.08,72.08,0,0,1,184,112Z"></path>
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 class="text-white font-medium">🔍 Visual Insight Agent</h3>
+                              <p class="text-[#a3acb2] text-sm">Good if you're focusing on chart/graph interpretation</p>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-3">
+                            <div class="text-white" data-icon="PuzzlePiece" data-size="20px" data-weight="regular">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M160,160a8,8,0,0,0-8-8V88a8,8,0,0,0-8-8H88a8,8,0,0,0-8,8V152a8,8,0,0,0,8,8H152A8,8,0,0,0,160,160Zm40,0a8,8,0,0,0-8-8V88a8,8,0,0,0-8-8H88a8,8,0,0,0-8,8V152a8,8,0,0,0,8,8H192A8,8,0,0,0,200,160ZM128,128a8,8,0,0,0-8-8V88a8,8,0,0,0-8-8H88a8,8,0,0,0-8,8V120a8,8,0,0,0,8,8H120A8,8,0,0,0,128,128Z"></path>
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 class="text-white font-medium">🧩 Cross-Graph Agent</h3>
+                              <p class="text-[#a3acb2] text-sm">For more advanced future where it analyzes multiple graphs at once</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <p class="text-white text-sm font-medium leading-normal">Intelligence (RTJI)</p>
-                  </button>
+                  </div>
                 </div>
               </div>
               <div class="flex flex-col gap-1">
