@@ -1,3 +1,9 @@
+// Helper function to validate email format
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.(com|net|org)$/;
+    return emailRegex.test(email);
+}
+
 // Helper function to generate secure password
 function generatePassword() {
     const length = 12;
@@ -13,19 +19,23 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     e.preventDefault();
     
     const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
+    const email = document.getElementById('email').value.trim().toLowerCase(); // Convert email to lowercase
     const department = document.getElementById('department').value;
     const role = document.getElementById('role').value;
     const errorMessage = document.getElementById('errorMessage');
     const successMessage = document.getElementById('successMessage');
 
     try {
+        // Reset previous error messages
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+
         // Validate form data
         if (!name || name.length < 2) {
             throw new Error('Name must be at least 2 characters');
         }
-        if (!email || !email.includes('@')) {
-            throw new Error('Please enter a valid email address');
+        if (!email || !isValidEmail(email)) {
+            throw new Error('Please enter a valid email address (must be .com, .net, or .org)');
         }
         if (!department) {
             throw new Error('Please select a department');
@@ -34,11 +44,25 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             throw new Error('Please select a role');
         }
 
-        // Ensure department is in the allowed list
-        const allowedDepartments = ['Technical', 'Financial', 'Project', 'Legal', 'Compliance', 'Marketing', 'Canopy'];
-        if (!allowedDepartments.includes(department)) {
+        // Ensure department is in the allowed list and properly capitalized
+        const allowedDepartments = {
+            'Technical': 'Technical',
+            'Financial': 'Financial',
+            'Project': 'Project',
+            'Legal': 'Legal',
+            'Compliance': 'Compliance',
+            'Marketing': 'Marketing',
+            'Canopy': 'Canopy'
+        };
+        
+        const properDepartment = allowedDepartments[department];
+        if (!properDepartment) {
             throw new Error('Invalid department selected');
         }
+
+        // Show loading state
+        document.getElementById('registerForm').style.opacity = '0.5';
+        document.getElementById('registerForm').style.pointerEvents = 'none';
 
         const response = await fetch('/api/core/auth/register', {
             method: 'POST',
@@ -48,14 +72,15 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             body: JSON.stringify({ 
                 name,
                 email,
-                department,
+                department: properDepartment, // Use properly capitalized department
                 role
             }),
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Registration failed');
+            const errorData = await response.json();
+            const error = errorData.errors ? errorData.errors[0].message : errorData.message;
+            throw new Error(error || 'Registration failed');
         }
 
         const data = await response.json();

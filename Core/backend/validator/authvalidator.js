@@ -7,7 +7,8 @@ const registerSchema = Joi.object({
         .max(100)
         .required(),
     email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org'] } })
+        .email()
+        .pattern(/^[^\s@]+@[^\s@]+\.(com|net|org)$/)
         .required(),
     department: Joi.string()
         .valid('Technical', 'Financial', 'Project', 'Legal', 'Compliance', 'Marketing', 'Canopy')

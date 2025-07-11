@@ -269,5 +269,20 @@
       </div>
     </div>
     <script src="index.js"></script>
+      <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add click event listener to all branch buttons
+        document.querySelectorAll('.branch-button').forEach(button => {
+          button.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent any default behavior
+            const branch = this.getAttribute('data-branch');
+            if (branch === 'project') {
+              // Use absolute path to ensure correct navigation
+              window.location.href = '/branches/projects/frontend/pb-branch-access.html';
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>
